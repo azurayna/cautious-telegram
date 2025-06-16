@@ -9,7 +9,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
 import pandas as pd
 import numpy as np
 
@@ -75,6 +75,12 @@ if reduction_method == "PCA":
 
         plt.contourf(xx, yy, Z, alpha=0.3, cmap='Set1')
         scatter = plt.scatter(X_proj[:, 0], X_proj[:, 1], c=y, cmap='Set1', edgecolor='k')
+
+        # Plot user input
+        user_proj = reducer.transform([user_input])
+        plt.scatter(user_proj[0, 0], user_proj[0, 1], color='black', marker='*', s=200, label='Your Input')
+        plt.legend()
+
         plt.xlabel('Component 1')
         plt.ylabel('Component 2')
         plt.title(f'{reduction_method} Projection with Decision Boundary')
@@ -104,6 +110,16 @@ st.subheader("Classification Report")
 report = classification_report(y_test, y_pred, target_names=labels, output_dict=True)
 st.dataframe(pd.DataFrame(report).transpose())
 
+# Confusion matrix
+st.markdown("---")
+st.subheader("Confusion Matrix")
+cm = confusion_matrix(y_test, y_pred)
+fig2, ax2 = plt.subplots()
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=labels, yticklabels=labels, ax=ax2)
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+st.pyplot(fig2)
+
 # Feature importance
 st.markdown("---")
 st.subheader("Feature Importances")
@@ -121,3 +137,4 @@ if reduction_method == "PCA":
     st.markdown("---")
     st.subheader("PCA Component Contributions")
     st.dataframe(pd.DataFrame(reducer.components_, columns=data.feature_names, index=['PC1', 'PC2']))
+
